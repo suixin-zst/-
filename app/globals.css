@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/*
+ * 设计 tokens —— 全站唯一的颜色 / 字体 / 圆角定义处（契约的一部分）
+ * 页面里禁止散落硬编码色值，只能用这里的 token 派生出的工具类
+ */
+@theme {
+  --color-paper: #faf9f7; /* 暖白底 */
+  --color-card: #ffffff;
+  --color-ink: #292524; /* 主文字 */
+  --color-ink-soft: #57534e; /* 次级文字 */
+  --color-line: #e7e5e4; /* 分隔线 */
+  --color-spotlight: #c25030; /* 聚光珊瑚（主色） */
+  --color-spotlight-deep: #8b3018;
+  --color-spotlight-tint: #faeae5;
+  --color-gold: #b88018; /* 评分金 */
+  --color-gold-tint: #faf0dc;
+  --color-gold-deep: #6a4005;
+  --font-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei",
+    sans-serif;
+  --radius-card: 1rem;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+  }
+}

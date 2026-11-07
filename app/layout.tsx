@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
   title: "台前 · 主持人 × 商家直聘平台",
@@ -19,9 +20,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-paper text-ink antialiased">
+      <body className="flex min-h-screen flex-col bg-paper text-ink antialiased">
         <SiteHeader />
-        <main>{children}</main>
+        <main className="flex-1">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );

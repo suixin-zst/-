@@ -4,9 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Rating } from "@/components/ui/rating";
 import { Select } from "@/components/ui/select";
+import { Skeleton, HostCardSkeleton, GigCardSkeleton } from "@/components/ui/skeleton";
+import { Tag } from "@/components/ui/tag";
 import { Textarea } from "@/components/ui/textarea";
 
 export const metadata = { title: "组件样板 · 台前" };
@@ -17,6 +21,7 @@ const swatches = [
   { name: "spotlight", className: "bg-spotlight" },
   { name: "spotlight-tint", className: "bg-spotlight-tint" },
   { name: "gold", className: "bg-gold" },
+  { name: "jade", className: "bg-jade" },
   { name: "ink", className: "bg-ink" },
   { name: "line", className: "bg-line" },
 ];
@@ -76,6 +81,36 @@ export default function DevUiPage() {
         </div>
       </Section>
 
+      <Section title="标签 Tag">
+        <div className="flex flex-wrap items-center gap-3">
+          <Tag>默认</Tag>
+          <Tag tone="spotlight">婚礼</Tag>
+          <Tag tone="gold">年会</Tag>
+          <Tag tone="jade">直播</Tag>
+          <Tag tone="ink">路演</Tag>
+        </div>
+      </Section>
+
+      <Section title="图标 Icon">
+        <div className="flex flex-wrap items-center gap-4 text-ink">
+          {(["mic", "star", "map-pin", "calendar", "clock", "users", "search", "video", "message", "wallet", "shield", "spark", "arrow-right"] as const).map((name) => (
+            <div key={name} className="flex flex-col items-center gap-1">
+              <Icon name={name} size={20} />
+              <span className="text-[10px] text-ink-soft">{name}</span>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="评分 Rating">
+        <div className="flex flex-wrap items-center gap-4">
+          <Rating rating={4.9} count={12} />
+          <Rating rating={4.5} count={8} />
+          <Rating rating={5.0} hideCount />
+          <Rating rating={3.8} count={3} />
+        </div>
+      </Section>
+
       <Section title="表单 Input / Select / Textarea">
         <div className="grid max-w-2xl gap-5">
           <div>
@@ -103,6 +138,18 @@ export default function DevUiPage() {
           <Avatar name="林晚秋" size="md" />
           <Avatar name="林晚秋" size="lg" />
           <Avatar name="林晚秋" size="xl" />
+        </div>
+      </Section>
+
+      <Section title="骨架屏 Skeleton">
+        <div className="grid gap-6 md:grid-cols-2">
+          <HostCardSkeleton />
+          <GigCardSkeleton />
+        </div>
+        <div className="mt-4 flex gap-3">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-8 w-32 rounded-card" />
         </div>
       </Section>
 

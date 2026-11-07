@@ -2,14 +2,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { loadHost, loadHostReviews, loadHosts } from "@/lib/hosts";
+import { demoHosts, DEMO_HOST_ID } from "@/lib/demo-data";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { Rating } from "@/components/ui/rating";
 import { Tag } from "@/components/ui/tag";
+import { ScrollToButton } from "@/components/ui/scroll-to-button";
 import { InviteHostButton } from "@/components/hosts/invite-host-button";
+import type { HostDetail, HostListItem } from "@/lib/hosts";
+import type { WorkRow } from "@/lib/types";
 
 export const metadata = { title: "主持人 · 台前" };
 
@@ -17,6 +20,7 @@ export const metadata = { title: "主持人 · 台前" };
  * 主持人档案详情页 —— 商家决定是否合作的关键页面
  *
  * 数据源：profiles + host_profiles + works + reviews（四表联查）
+ * 数据库空时用 demo 数据兜底
  */
 export default async function HostProfilePage({
   params,
@@ -30,18 +34,94 @@ export default async function HostProfilePage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const host = await loadHost(supabase, id);
+  // 先查数据库，没有就用 demo 数据
+  let host: HostDetail | null = null;
+  let reviews: (import("@/lib/types").ReviewRow & { reviewerName: string })[] = [];
+  let similar: HostListItem[] = [];
+
+  const dbHost = await loadHost(supabase, id);
+
+  if (dbHost) {
+    host = dbHost;
+    [reviews] = await Promise.all([
+      loadHostReviews(supabase, id),
+      loadHosts(supabase),
+    ]);
+    const allHosts = await loadHosts(supabase);
+    similar = allHosts
+      .filter((h) => h.id !== id && h.styles.some((s) => host!.styles.includes(s)))
+      .slice(0, 3);
+  } else {
+    // 数据库没有，用 demo 数据兜底
+    const demoHost = demoHosts.find((h) => h.id === id) || demoHosts[0];
+    host = {
+      id: demoHost.id,
+      name: demoHost.name,
+      avatarUrl: demoHost.avatarUrl,
+      city: demoHost.city,
+      styles: demoHost.styles,
+      bio: demoHost.bio,
+      priceHourly: demoHost.priceHourly,
+      priceHalfDay: demoHost.priceHalfDay,
+      priceFullDay: demoHost.priceFullDay,
+      experienceYears: demoHost.experienceYears,
+      isVerified: demoHost.isVerified,
+      rating: demoHost.rating,
+      ratingCount: demoHost.ratingCount,
+      works: demoHost.works.map((w) => ({
+        id: w.id,
+        host_id: demoHost.id,
+        type: w.type as "video" | "image" | "audio",
+        url: w.url,
+        title: w.title,
+        sort: 0,
+        created_at: "",
+      })) as WorkRow[],
+    };
+
+    // demo 评价
+    reviews = [
+      {
+        id: "r1",
+        gig_id: "demo-gig-1",
+        reviewer_id: "demo-merchant-1",
+        reviewee_id: demoHost.id,
+        rating: 5,
+        content: "非常专业，控场能力强，现场气氛调动得很好。",
+        created_at: "2026-10-15T10:00:00Z",
+        reviewerName: "某科技公司",
+      },
+      {
+        id: "r2",
+        gig_id: "demo-gig-2",
+        reviewer_id: "demo-merchant-2",
+        reviewee_id: demoHost.id,
+        rating: 5,
+        content: "台风稳健，临场反应快，合作很愉快。",
+        created_at: "2026-09-20T10:00:00Z",
+        reviewerName: "某汽车品牌",
+      },
+    ];
+
+    // demo 相似主持人
+    similar = demoHosts
+      .filter((h) => h.id !== demoHost.id && h.styles.some((s) => demoHost.styles.includes(s)))
+      .slice(0, 3)
+      .map((h) => ({
+        id: h.id,
+        name: h.name,
+        avatarUrl: h.avatarUrl,
+        city: h.city,
+        styles: h.styles,
+        priceHourly: h.priceHourly,
+        priceHalfDay: h.priceHalfDay,
+        rating: h.rating,
+        ratingCount: h.ratingCount,
+        isVerified: h.isVerified,
+      }));
+  }
+
   if (!host) notFound();
-
-  const [reviews, allHosts] = await Promise.all([
-    loadHostReviews(supabase, id),
-    loadHosts(supabase),
-  ]);
-
-  // 推荐相似风格的主持人
-  const similar = allHosts
-    .filter((h) => h.id !== id && h.styles.some((s) => host.styles.includes(s)))
-    .slice(0, 3);
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
@@ -99,10 +179,19 @@ export default async function HostProfilePage({
           </div>
 
           <div className="mt-6 flex gap-3">
-            <InviteHostButton hostId={host.id} hostName={host.name} />
-            <Button variant="outline" onClick={() => document.getElementById("works")?.scrollIntoView({ behavior: "smooth" })}>
-              先看作品
-            </Button>
+            {host.id.startsWith("demo-") ? (
+              <Link href="/merchant/dashboard">
+                <button
+                  type="button"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-spotlight px-5 text-sm font-medium text-white transition-colors hover:bg-spotlight-deep"
+                >
+                  立即合作
+                </button>
+              </Link>
+            ) : (
+              <InviteHostButton hostId={host.id} hostName={host.name} />
+            )}
+            <ScrollToButton targetId="works">先看作品</ScrollToButton>
           </div>
         </div>
       </div>
@@ -209,7 +298,7 @@ export default async function HostProfilePage({
                 <div>
                   <p className="font-medium">{h.name}</p>
                   <p className="text-xs text-ink-soft">
-                    {h.city} · {h.styles.slice(0, 2).join(" / ") || "综合"}
+                    {h.city ?? "综合"} · {h.styles.slice(0, 2).join(" / ") || "综合"}
                   </p>
                 </div>
               </Link>

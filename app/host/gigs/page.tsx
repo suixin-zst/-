@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { loadOpenGigs } from "@/lib/hosts";
+import { demoGigs } from "@/lib/demo-data";
 import { GigDirectory } from "@/components/gigs/gig-directory";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import type { GigWithMerchant } from "@/lib/hosts";
 
 export const metadata = { title: "商单大厅 · 台前" };
 
@@ -11,10 +11,33 @@ export const metadata = { title: "商单大厅 · 台前" };
  * 商单大厅 —— 主持人浏览开放商单，一键报名
  *
  * 只展示 status=open 的商单；按创建时间倒序
+ * 数据库空时用 demo 数据兜底
  */
 export default async function GigHallPage() {
   const supabase = await createClient();
-  const gigs = await loadOpenGigs(supabase);
+  let gigs = await loadOpenGigs(supabase);
+
+  // 数据库空时用 demo 数据兜底
+  if (gigs.length === 0) {
+    gigs = demoGigs.map(
+      (g): GigWithMerchant => ({
+        id: g.id,
+        merchant_id: g.merchant_id,
+        title: g.title,
+        type: g.type as GigWithMerchant["type"],
+        city: g.city,
+        event_date: g.event_date,
+        duration: g.duration,
+        budget_min: g.budget_min,
+        budget_max: g.budget_max,
+        requirements: g.requirements,
+        description: g.description,
+        status: g.status,
+        created_at: g.created_at,
+        merchantName: g.merchantName,
+      })
+    );
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">

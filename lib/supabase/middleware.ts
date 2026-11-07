@@ -32,11 +32,26 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+
+  // 游客可浏览的公开页面：商单大厅 / 主持人列表 / 商单详情 / 主持人主页（demo 数据兜底）
+  const isPublicBrowse =
+    path === "/host/gigs" ||
+    path.startsWith("/host/gigs/") ||
+    path.startsWith("/merchant/hosts") ||
+    path === "/gig" ||
+    path.startsWith("/gig/") ||
+    (path.startsWith("/host/") &&
+      !path.startsWith("/host/dashboard") &&
+      !path.startsWith("/host/profile") &&
+      !path.startsWith("/host/gigs"));
+
+  // 需要登录的：工作台、聊天、资料编辑等（排除公开浏览页）
   const isProtected =
-    path.startsWith("/host") ||
-    path.startsWith("/merchant") ||
-    path.startsWith("/chat") ||
-    path.startsWith("/gig");
+    !isPublicBrowse &&
+    (path.startsWith("/host") ||
+      path.startsWith("/merchant") ||
+      path.startsWith("/chat") ||
+      path.startsWith("/gig"));
   const isAuthPage = path.startsWith("/auth");
 
   if (isProtected && !user) {

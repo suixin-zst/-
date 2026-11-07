@@ -3,27 +3,63 @@
 /*
  * 设计 tokens —— 全站唯一的颜色 / 字体 / 圆角定义处（契约的一部分）
  * 页面里禁止散落硬编码色值，只能用这里的 token 派生出的工具类
+ *
+ * h4 起：色值翻译自副手视觉体系（fushou-archive），保持 token 名不变，
+ * 全站 162 处 bg-paper / text-ink / text-spotlight 等调用方零改动。
  */
 @theme {
-  --color-paper: #faf9f7; /* 暖白底 */
-  --color-card: #ffffff;
-  --color-ink: #292524; /* 主文字 */
-  --color-ink-soft: #57534e; /* 次级文字 */
-  --color-line: #e7e5e4; /* 分隔线 */
-  --color-spotlight: #c25030; /* 聚光珊瑚（主色） */
-  --color-spotlight-deep: #8b3018;
-  --color-spotlight-tint: #faeae5;
-  --color-gold: #b88018; /* 评分金 */
-  --color-gold-tint: #faf0dc;
-  --color-gold-deep: #6a4005;
-  --font-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
-  --font-sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei",
-    sans-serif;
-  --radius-card: 1rem;
+  /* 底色：暖象牙，比之前的冷白更有纸质感 */
+  --color-paper: #f5efe4;
+  --color-paper-2: #ede4d4;
+  --color-card: #fffaf0;
+
+  /* 文字：更深的主色，灰度更丰富 */
+  --color-ink: #15110e;
+  --color-ink-soft: #7b7062;
+  --color-ink-2: #221c17;
+
+  /* 分隔线：暖米色，不再是冷灰 */
+  --color-line: #ddd2bf;
+  --color-line-strong: #c7b9a2;
+
+  /* 聚光珊瑚（主色）：色相微调，整体一致 */
+  --color-spotlight: #b23a2f;
+  --color-spotlight-deep: #8e2b23;
+  --color-spotlight-tint: #f3e0da;
+
+  /* 评分金：更饱满的暖金 */
+  --color-gold: #c9953c;
+  --color-gold-tint: #f6ead2;
+  --color-gold-deep: #9c6f24;
+
+  /* 翡翠绿：新增色系，用于状态 / 商家侧 / 差异化标签 */
+  --color-jade: #2e5e4e;
+  --color-jade-deep: #22493d;
+  --color-jade-soft: #e0ebe5;
+
+  --font-display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Consolas, "Cascadia Mono", monospace;
+
+  --radius-card: 18px;
 }
 
 @layer base {
   body {
     font-family: var(--font-sans);
+    color: var(--color-ink);
+    background-color: var(--color-paper);
+    background-image:
+      radial-gradient(circle at 12% -8%, rgba(178, 58, 47, 0.07), transparent 38%),
+      radial-gradient(circle at 88% 2%, rgba(201, 149, 60, 0.09), transparent 34%),
+      linear-gradient(rgba(21, 17, 14, 0.024) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(21, 17, 14, 0.024) 1px, transparent 1px);
+    background-size: auto, auto, 32px 32px, 32px 32px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: rgba(178, 58, 47, 0.2);
   }
 }

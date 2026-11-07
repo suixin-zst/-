@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>台前 · 路演幻灯</title>
+<style>
+  :root {
+    --ink: #15110e;
+    --ink-2: #221c17;
+    --paper: #f5efe4;
+    --paper-2: #ede4d4;
+    --card: #fffaf0;
+    --line: #ddd2bf;
+    --line-strong: #c7b9a2;
+    --muted: #7b7062;
+    --stage: #b23a2f;
+    --stage-deep: #8e2b23;
+    --gold: #c9953c;
+    --gold-deep: #9c6f24;
+    --jade: #2e5e4e;
+    --jade-deep: #22493d;
+    --display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: #0d0b09;
+    color: var(--ink);
+    font-family: var(--sans);
+    overflow: hidden;
+  }
+
+  .deck { position: relative; width: 100vw; height: 100vh; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 6vh 7vw 5vh;
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(circle at 12% -6%, rgba(178, 58, 47, 0.06), transparent 36%),
+      radial-gradient(circle at 88% 0%, rgba(201, 149, 60, 0.08), transparent 32%),
+      linear-gradient(rgba(21, 17, 14, 0.024) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(21, 17, 14, 0.024) 1px, transparent 1px);
+    background-size: auto, auto, 32px 32px, 32px 32px;
+    overflow: auto;
+  }
+
+  .slide.active { display: flex; animation: rise 0.32s ease both; }
+
+  @keyframes rise {
+    from { transform: translateY(10px); }
+    to { transform: translateY(0); }
+  }
+
+  .slide-inner {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(18px, 2.4vh, 30px);
+    flex: 1;
+  }
+
+  .slide-head, .slide-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .slide-head { border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .slide-footer { border-top: 1px solid var(--line); padding-top: 12px; margin: 0 auto; width: min(1180px, 100%); }
+
+  .kicker {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .brand-mini {
+    font-family: var(--display);
+    font-size: 18px;
+    color: var(--ink);
+    letter-spacing: 0.08em;
+  }
+
+  .h2 {
+    margin: 0;
+    font-family: var(--display);
+    font-size: clamp(34px, 5.2vw, 74px);
+    font-weight: 600;
+    line-height: 1.16;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .lede {
+    margin: 0;
+    font-size: clamp(15px, 1.5vw, 21px);
+    line-height: 1.8;
+    color: var(--muted);
+    max-width: 920px;
+  }
+
+  .accent-stage { color: var(--stage); }
+  .accent-gold { color: var(--gold); }
+  .accent-jade { color: var(--jade); }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: clamp(18px, 2vw, 28px);
+    box-shadow: 0 24px 50px -40px rgba(21, 17, 14, 0.45);
+  }
+
+  .card-num {
+    font-family: var(--display);
+    font-size: 28px;
+    color: var(--line-strong);
+  }
+
+  .card h3 {
+    margin: 10px 0 6px;
+    font-family: var(--display);
+    font-size: clamp(20px, 2vw, 28px);
+    font-weight: 600;
+  }
+
+  .card p {
+    margin: 0;
+    font-size: clamp(12px, 1.1vw, 15px);
+    line-height: 1.75;
+    color: var(--muted);
+  }
+
+  .stats .stat {
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+
+  .stats .stat b {
+    display: block;
+    font-family: var(--display);
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .stats .stat .unit {
+    display: inline;
+    font-size: 0.42em;
+    color: var(--muted);
+  }
+
+  .stats .stat > span {
+    display: block;
+    margin-top: 10px;
+    font-size: clamp(12px, 1.2vw, 16px);
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .quote {
+    margin: 0;
+    padding-left: 20px;
+    border-left: 3px solid var(--stage);
+    font-family: var(--display);
+    font-size: clamp(20px, 2.6vw, 36px);
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .big-claim {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-family: var(--display);
+    font-size: clamp(24px, 3.2vw, 46px);
+    color: var(--muted);
+  }
+
+  .big-claim b {
+    color: var(--gold);
+    font-size: 1.35em;
+    letter-spacing: -0.03em;
+  }
+
+  .big-claim .arrow { color: var(--line-strong); }
+
+  .role {
+    border-radius: 18px;
+    padding: clamp(22px, 2.6vw, 36px);
+    color: #fff8ef;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .role::after {
+    content: "";
+    position: absolute;
+    right: -50px;
+    bottom: -70px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 250, 240, 0.16);
+    box-shadow: 0 0 0 34px rgba(255, 250, 240, 0.04);
+  }
+
+  .role-host {
+    background:
+      radial-gradient(circle at 82% 12%, rgba(255, 250, 240, 0.16), transparent 36%),
+      linear-gradient(145deg, #8e2b23, #b23a2f 62%, #c9693f);
+  }
+
+  .role-merchant {
+    background:
+      radial-gradient(circle at 82% 12%, rgba(255, 250, 240, 0.14), transparent 36%),
+      linear-gradient(145deg, #22493d, #2e5e4e 62%, #4a7a62);
+  }
+
+  .role .kicker { color: rgba(255, 248, 239, 0.55); }
+
+  .role h3 {
+    margin: 8px 0 0;
+    font-family: var(--display);
+    font-size: clamp(28px, 3vw, 42px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .role ul {
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+    font-size: clamp(12px, 1.2vw, 16px);
+    color: rgba(255, 248, 239, 0.74);
+  }
+
+  .role li::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 248, 239, 0.55);
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .flow {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .flow-step {
+    flex: 1;
+    min-width: 160px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .flow-step b {
+    font-family: var(--display);
+    font-size: 26px;
+    color: var(--stage);
+    line-height: 1;
+  }
+
+  .flow-step span {
+    font-size: clamp(13px, 1.2vw, 16px);
+    font-weight: 700;
+  }
+
+  .flow-step em {
+    font-style: normal;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .flow-arrow {
+    align-self: center;
+    color: var(--line-strong);
+    font-size: 20px;
+  }
+
+  .demo-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .demo-note .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e2b04a;
+    box-shadow: 0 0 0 3px rgba(226, 176, 74, 0.2);
+  }
+
+  .demo-foot {
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-family: var(--display);
+    font-size: clamp(18px, 2vw, 28px);
+    color: var(--muted);
+  }
+
+  .demo-foot .sep { color: var(--line-strong); }
+
+  .demo-foot em {
+    font-style: normal;
+    margin-left: auto;
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+
+  .compare { display: grid; gap: 14px; }
+
+  .compare-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 100px;
+    align-items: center;
+    gap: 14px;
+    font-size: clamp(12px, 1.2vw, 15px);
+  }
+
+  .compare-row b {
+    text-align: right;
+    font-family: var(--display);
+    font-size: clamp(20px, 2vw, 28px);
+    font-weight: 600;
+  }
+
+  .bar-track {
+    height: 16px;
+    background: var(--paper-2);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .bar {
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  .bar-stage { width: 100%; background: linear-gradient(90deg, #8e2b23, #b23a2f); }
+  .bar-gold { width: 26.7%; background: linear-gradient(90deg, #9c6f24, #c9953c); }
+
+  .compare-note {
+    font-size: clamp(13px, 1.4vw, 18px);
+    color: var(--muted);
+  }
+
+  .compare-note b {
+    color: var(--gold-deep);
+    font-family: var(--display);
+    font-size: 1.25em;
+  }
+
+  .gtm {
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .gtm-col {
+    flex: 1;
+    min-width: 220px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px;
+  }
+
+  .gtm-col h3 {
+    margin: 8px 0;
+    font-family: var(--display);
+    font-size: clamp(22px, 2.4vw, 34px);
+    font-weight: 600;
+  }
+
+  .gtm-col p {
+    margin: 0;
+    font-size: clamp(12px, 1.2vw, 15px);
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .gtm-arrow {
+    align-self: center;
+    font-size: 26px;
+    color: var(--line-strong);
+  }
+
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .phase {
+    border-top: 2px solid var(--line);
+    padding-top: 16px;
+  }
+
+  .phase.active { border-color: var(--gold); }
+
+  .phase span {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+  }
+
+  .phase h3 {
+    margin: 10px 0 6px;
+    font-family: var(--display);
+    font-size: clamp(22px, 2.4vw, 32px);
+    font-weight: 600;
+  }
+
+  .phase p {
+    margin: 0;
+    font-size: clamp(12px, 1.2vw, 15px);
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  /* Cover */
+
+  .cover {
+    background-color: var(--ink);
+    background-image: none;
+    color: var(--paper);
+    overflow: hidden;
+    padding: 6vh 7vw 5vh;
+  }
+
+  .cover::before {
+    content: "";
+    position: absolute;
+    inset: -30% 12% auto;
+    height: 120%;
+    background: radial-gradient(
+      ellipse at 50% 0%,
+      rgba(201, 149, 60, 0.3),
+      rgba(178, 58, 47, 0.1) 38%,
+      transparent 68%
+    );
+    pointer-events: none;
+  }
+
+  .cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(178, 58, 47, 0.18), transparent 22%, transparent 78%, rgba(178, 58, 47, 0.18)),
+      linear-gradient(180deg, transparent 68%, rgba(21, 17, 14, 0.75));
+    pointer-events: none;
+  }
+
+  .cover > * { position: relative; z-index: 2; }
+
+  .cover-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: rgba(245, 239, 228, 0.55);
+    text-transform: uppercase;
+  }
+
+  .cover-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .cover-title {
+    margin: 0;
+    font-family: var(--display);
+    font-size: clamp(96px, 18vw, 250px);
+    font-weight: 600;
+    line-height: 0.92;
+    letter-spacing: -0.06em;
+    color: var(--paper);
+    text-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  }
+
+  .cover-sub {
+    margin: 0;
+    font-family: var(--display);
+    font-size: clamp(26px, 3.4vw, 52px);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    color: rgba(245, 239, 228, 0.88);
+  }
+
+  .cover-desc {
+    margin: 0;
+    font-size: clamp(13px, 1.3vw, 17px);
+    letter-spacing: 0.08em;
+    color: rgba(245, 239, 228, 0.5);
+  }
+
+  .cover-footer {
+    border-top-color: rgba(245, 239, 228, 0.14);
+    color: rgba(245, 239, 228, 0.45);
+  }
+
+  .closing .cover-title { font-size: clamp(56px, 9vw, 120px); }
+
+  /* HUD */
+
+  .hud {
+    position: fixed;
+    right: 22px;
+    bottom: 62px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(21, 17, 14, 0.72);
+    color: rgba(245, 239, 228, 0.72);
+    backdrop-filter: blur(8px);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .dots { display: flex; gap: 5px; }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(245, 239, 228, 0.28);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  .dot.active {
+    background: var(--gold);
+    transform: scale(1.3);
+  }
+
+  .counter {
+    font-family: var(--mono, ui-monospace, Consolas, monospace);
+    font-variant-numeric: tabular-nums;
+    color: rgba(245, 239, 228, 0.8);
+  }
+
+  .hint {
+    position: fixed;
+    left: 22px;
+    bottom: 22px;
+    z-index: 20;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: rgba(245, 239, 228, 0.4);
+    pointer-events: none;
+  }
+
+  /* Responsive */
+
+  @media (max-width: 820px) {
+    .slide { padding: 5vh 6vw 4vh; }
+    .grid-3, .roadmap { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .flow-arrow { display: none; }
+    .compare-row { grid-template-columns: 82px 1fr 74px; }
+    .gtm-arrow { display: none; }
+    .hint { display: none; }
+  }
+
+  /* Print */
+
+  @media print {
+    body { overflow: visible; background: #fff; }
+    .deck { height: auto; }
+    .slide {
+      display: flex !important;
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      page-break-after: always;
+      animation: none;
+    }
+    .hud, .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <section class="slide cover active">
+    <header class="cover-top">
+      <span>HACKATHON · 主持人 × 商家</span>
+      <span>2026 · 48H</span>
+    </header>
+    <div class="cover-main">
+      <h1 class="cover-title">台前</h1>
+      <p class="cover-sub">好主持，不该只在<span class="accent-gold">群里</span>等活。</p>
+      <p class="cover-desc">商家发单 · 主持人接单 · 双方直接聊</p>
+    </div>
+    <footer class="slide-footer cover-footer">
+      <span>台前 TAIQIAN</span>
+      <span>BOSS 直聘 for 主持人</span>
+    </footer>
+  </section>
+
+  <section class="slide">
+    <header class="slide-head"><span class="kicker">01 · PAIN</span><span class="brand-mini">台前</span></header>
+    <div class="slide-inner">
+      <h2 class="h2">接一场主持，<br />先过<span class="accent-stage">五道群</span>。</h2>
+      <div class="grid-3 stats">
+        <div class="stat"><b>7</b><span>个微信群<br />重复发简历</span></div>
+        <div class="stat"><b>30–50<span class="unit">%</span></b><span>被群主 / 中介<br />抽走</span></div>
+        <div class="stat"><b>0</b><span>份作品沉淀<br />每次都被当新人</span></div>
+      </div>
+      <blockquote class="quote">「每次接单，都像重新做一次新人。」</blockquote>
+    </div>
+    <footer class="slide-footer"><span>台前 TAIQIAN</span><span>HACKATHON 2026</span></footer>
+  </section>
+
+  <section class="slide">
+    <header class="slide-head"><span class="kicker">02 · SOLUTION</span><span class="brand-mini">台前</span></header>
+    <div class="slide-inner">
+      <h2 class="h2">把接单，搬回台前。</h2>
+      <div class="grid-3">
+        <div class="card">
+          <span class="card-num">01</span>
+          <h3>作品说话</h3>
+          <p>婚礼、年会、发布会现场视频。先看控场，再谈价格。</p>
+        </div>
+        <div class="card">
+          <span class="card-num">02</span>
+          <h3>透明报价</h3>
+          <p>按小时、半天、全天写清楚，不玩「私聊报价」。</p>
+        </div>
+        <div class="card">
+          <span class="card-num">03</span>
+          <h3>直接沟通</h3>
+          <p>站内聊，不加微信、不留手机号，合作留痕。</p>
+        </div>
+      </div>
+      <div class="big-claim">中介 30% <span class="arrow">→</span> 台前 <b>8%</b></div>
+    </div>
+    <footer class="slide-footer"><span>台前 TAIQIAN</span><span>HACKATHON 2026</span></footer>
+  </section>
+
+  <section class="slide">
+    <header class="slide-head"><span class="kicker">03 · PRODUCT</span><span class="brand-mini">台前</span></header>
+    <div class="slide-inner">
+      <h2 class="h2">一个舞台，两个世界。</h2>
+      <div class="grid-2">
+        <div class="role role-host">
+          <div>
+            <span class="kicker">FOR HOSTS</span>
+            <h3>我是主持人</h3>
+            <ul>
+              <li>建主页 + 作品集</li>
+              <li>逛商单、直接报名</li>
+              <li>和商家直接聊</li>
+            </ul>
+          </div>
+        </div>
+        <div class="role role-merchant">
+          <div>
+            <span class="kicker">FOR MERCHANTS</span>
+            <h3>我是商家</h3>
+            <ul>
+              <li>发需求，等对的人来</li>
+              <li>看作品、评价、报价</li>
+              <li>直接聊，敲定合作</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p class="lede">首页即分流，一进门就是自己的世界。</p>
+    </div>
+    <footer class="slide-footer"><span>台前 TAIQIAN</span><span>HACKATHON 2026</span></footer>
+  </section>
+
+  <section class="slide">
+    <header class="slide-head"><span class="kicker">04 · DEMO</span><span class="brand-mini">台前</span></header>
+    <div class="slide-inner">
+      <h2 class="h2">90 秒，跑完一单。</h2>
+      <div class="flow">
+        <div class="flow-step"><b>01</b><span>商家发单</span><em>城市 / 日期 / 预算</em></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><b>02</b><span>主持人报名</span><em>作品集 + 报价</em></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><b>03</b><span>商家看人</span><em>作品 / 评价 / 档期</em></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><b>04</b><span>直接聊，达成</span><em>状态从报名到已达成</em></div>
+      </div>
+      <div class="demo-note"><span class="dot"></span> LIVE DEMO · 现场演示</div>
+      <div class="demo-foot">
+        <span>商家端</span>
+        <span class="sep">→</span>
+        <span>主持人端</span>
+        <span class="sep">→</span>
+        <span>站内聊天</span>
+      </div>
+    </div>
+    <footer class="slide-footer"><span>台前 TAIQIAN</span><span>HACKATHON 2026</span></footer>
+  </section>
+
+  <section class="slide">
+    <header class="slide-head"><span class="kicker">05 · WHY US</span><span class="brand-mini">台前</span></header>
+    <div class="slide-inner">
+      <h2 class="h2">通用平台做不深的三件事。</h2>
+      <div class="grid-3">
+        <div class="card">
+          <span class="card-num">▶</span>
+          <h3>视频作品</h3>
+          <p>主持能力必须看现场，不是一张头像、一段自我介绍。</p>
+        </div>
+        <div class="card">
+          <span class="card-num">▦</span>
+          <h3>档期日历</h3>
+          <p>主持人是按天卖的，档期就是库存，错过就没了。</p>
+        </div>
+        <div class="card">
+          <span class="card-num">¥</span>
+          <h3>行业定价</h3>
+          <p>时 / 半 / 全天，不是月薪，也不是一个「面议」。</p>
+        </div>
+      </div>
+    </div>
+    <footer class="slide-footer"><span>台前 TAIQIAN</span><span>HACKATHON 2026</span></footer>
+  </section>
+
+  <section class="slide">
+    <header class="slide-head"><span class="kicker">06 · BUSINESS</span><span class="brand-mini">台前</span></header>
+    <div class="slide-inner">
+      <h2 class="h2">我们只抽 <span class="accent-gold">8%</span>。</h2>
+      <div class="compare">
+        <div class="compare-row">
+          <span>中介 30%</span>
+          <div class="bar-track"><div class="bar bar-stage"></div></div>
+          <b>¥1,350</b>
+        </div>
+        <div class="compare-row">
+          <span>台前 8%</span>
+          <div class="bar-track"><div class="bar bar-gold"></div></div>
+          <b>¥360</b>
+        </div>
+      </div>
+      <p class="compare-note">按半天 ¥4,500 计算 · 主持人多拿 <b>¥990</b></p>
+      <p class="lede">成交抽佣 + 双端会员：认证置顶、批量邀约、精准推荐。</p>
+    </div>
+    <footer class="slide-footer"><span>台前 TAIQIAN</span><span>HACKATHON 2026</span></footer>
+  </section>
+
+  <section class="slide">
+    <header class="slide-head"><span class="kicker">07 · GO TO MARKET</span><span class="brand-mini">台前</span></header>
+    <div class="slide-inner">
+      <h2 class="h2">先打供给侧。</h2>
+      <div class="gtm">
+        <div class="gtm-col">
+          <span class="kicker">SUPPLY · 先</span>
+          <h3>主持人</h3>
+          <p>主持社团、传媒院校、自由职业主持。免费入驻，先攒作品和个人品牌。</p>
+        </div>
+        <span class="gtm-arrow">→</span>
+        <div class="gtm-col">
+          <span class="kicker">DEMAND · 后</span>
+          <h3>商家</h3>
+          <p>活动公司、中小企业市场部。高频、刚需、决策快，先做活动公司。</p>
+        </div>
+      </div>
+      <p class="lede">供给侧先攒作品，需求侧先切高频。两边都跑起来，再谈规模化。</p>
+    </div>
+    <footer class="slide-footer"><span>台前 TAIQIAN</span><span>HACKATHON 2026</span></footer>
+  </section>
+
+  <section class="slide">
+    <header class="slide-head"><span class="kicker">08 · ROADMAP</span><span class="brand-mini">台前</span></header>
+    <div class="slide-inner">
+      <h2 class="h2">从撮合，到行业标准。</h2>
+      <div class="roadmap">
+        <div class="phase active">
+          <span>NOW</span>
+          <h3>撮合</h3>
+          <p>作品 + 商单 + 直接聊，跑通核心闭环。</p>
+        </div>
+        <div class="phase">
+          <span>6 MONTHS</span>
+          <h3>担保</h3>
+          <p>评价体系 + 担保交易，解决「临场翻车」。</p>
+        </div>
+        <div class="phase">
+          <span>12 MONTHS</span>
+          <h3>标准</h3>
+          <p>认证、保险、培训，成为主持行业的入口。</p>
+        </div>
+      </div>
+    </div>
+    <footer class="slide-footer"><span>台前 TAIQIAN</span><span>HACKATHON 2026</span></footer>
+  </section>
+
+  <section class="slide cover closing">
+    <header class="cover-top">
+      <span>THANK YOU</span>
+      <span>台前 TAIQIAN</span>
+    </header>
+    <div class="cover-main">
+      <h2 class="cover-title">下一场活动，<br />从<span class="accent-gold">台前</span>开始。</h2>
+      <p class="cover-desc">主持人 × 商家直聘平台 · 谢谢，欢迎提问</p>
+    </div>
+    <footer class="slide-footer cover-footer">
+      <span>台前 TAIQIAN</span>
+      <span>THANK YOU</span>
+    </footer>
+  </section>
+
+</div>
+
+<div class="hud">
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">01 / 10</span>
+</div>
+<div class="hint">← → 翻页 · 点击左右半边也可以</div>
+
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+    var dotsWrap = document.getElementById("dots");
+    var counter = document.getElementById("counter");
+    var index = 0;
+
+    slides.forEach(function (_, i) {
+      var dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "dot";
+      dot.setAttribute("aria-label", "第 " + (i + 1) + " 页");
+      dot.addEventListener("click", function (event) {
+        event.stopPropagation();
+        show(i);
+      });
+      dotsWrap.appendChild(dot);
+    });
+
+    var dots = Array.prototype.slice.call(dotsWrap.children);
+
+    function show(next) {
+      index = Math.max(0, Math.min(next, slides.length - 1));
+      slides.forEach(function (slide, i) {
+        slide.classList.toggle("active", i === index);
+      });
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle("active", i === index);
+      });
+      counter.textContent =
+        String(index + 1).padStart(2, "0") +
+        " / " +
+        String(slides.length).padStart(2, "0");
+      if (history.replaceState) {
+        var url = new URL(window.location.href);
+        url.searchParams.set("s", String(index + 1));
+        history.replaceState(null, "", url.toString());
+      }
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var start = Number(params.get("s"));
+    if (Number.isFinite(start) && start > 0) {
+      index = Math.min(Math.max(start - 1, 0), slides.length - 1);
+    }
+    show(index);
+
+    document.addEventListener("keydown", function (event) {
+      if (["ArrowRight", "ArrowDown", "PageDown", " "].indexOf(event.key) >= 0) {
+        event.preventDefault();
+        show(index + 1);
+      } else if (["ArrowLeft", "ArrowUp", "PageUp"].indexOf(event.key) >= 0) {
+        event.preventDefault();
+        show(index - 1);
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        show(0);
+      } else if (event.key === "End") {
+        event.preventDefault();
+        show(slides.length - 1);
+      }
+    });
+
+    document.addEventListener("click", function (event) {
+      if (event.target.closest("a, button, .hud")) return;
+      if (event.clientX > window.innerWidth / 2) {
+        show(index + 1);
+      } else {
+        show(index - 1);
+      }
+    });
+  })();
+</script>
+</body>
+</html>

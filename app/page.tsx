@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { loadHosts, loadOpenGigs } from "@/lib/hosts";
+import { loadHosts, loadOpenGigs, type HostListItem, type GigWithMerchant } from "@/lib/hosts";
+import { demoHosts, demoGigs } from "@/lib/demo-data";
+import { HostCard } from "@/components/hosts/host-card";
+import { GigCard } from "@/components/gigs/gig-card";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Rating } from "@/components/ui/rating";
@@ -19,9 +22,46 @@ export default async function HomePage() {
     loadOpenGigs(supabase),
   ]);
 
+  // 数据库空时用 demo 兜底，首页也能展示真实卡片
+  const hostList: HostListItem[] =
+    hosts.length > 0
+      ? hosts
+      : demoHosts.map((h) => ({
+          id: h.id,
+          name: h.name,
+          avatarUrl: h.avatarUrl,
+          city: h.city,
+          styles: h.styles,
+          priceHourly: h.priceHourly,
+          priceHalfDay: h.priceHalfDay,
+          rating: h.rating,
+          ratingCount: h.ratingCount,
+          isVerified: h.isVerified,
+        }));
+
+  const gigList: GigWithMerchant[] =
+    openGigs.length > 0
+      ? openGigs
+      : demoGigs.map((g) => ({
+          id: g.id,
+          merchant_id: g.merchant_id,
+          title: g.title,
+          type: g.type as GigWithMerchant["type"],
+          city: g.city,
+          event_date: g.event_date,
+          duration: g.duration,
+          budget_min: g.budget_min,
+          budget_max: g.budget_max,
+          requirements: g.requirements,
+          description: g.description,
+          status: g.status,
+          created_at: g.created_at,
+          merchantName: g.merchantName,
+        }));
+
   // 统计数据（初期用固定值，后续可改为实时聚合）
   const stats = [
-    { value: hosts.length.toString(), label: "入驻主持人" },
+    { value: hostList.length.toString(), label: "入驻主持人" },
     { value: "18 min", label: "平均响应时间" },
     { value: "8%", label: "平台服务费" },
     { value: "4.8 / 5", label: "平均合作评分" },
@@ -276,9 +316,80 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <p className="mt-8 text-center text-sm text-ink-soft">
-          共 {openGigs.length} 张商单正在招募
-        </p>
+      </section>
+
+      {/* 推荐主持人（话筒卡） */}
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-spotlight">On stage</p>
+            <h2 className="mt-2 font-display text-3xl font-bold md:text-4xl">台上的人</h2>
+            <p className="mt-2 text-ink-soft">挑一位对味的主持，直接看作品、看报价。</p>
+          </div>
+          <Link
+            href="/merchant/hosts"
+            className="shrink-0 text-sm text-ink-soft transition-colors hover:text-spotlight"
+          >
+            查看全部 →
+          </Link>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
+          {hostList.slice(0, 4).map((h) => (
+            <HostCard key={h.id} host={h} />
+          ))}
+        </div>
+      </section>
+
+      {/* 正在招募（房子卡） */}
+      <section className="mx-auto max-w-6xl px-6 pb-16">
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-gold-deep">Open calls</p>
+            <h2 className="mt-2 font-display text-3xl font-bold md:text-4xl">正在招募的场子</h2>
+            <p className="mt-2 text-ink-soft">商家的真实需求，价格写在明面上，合适就报名。</p>
+          </div>
+          <Link
+            href="/host/gigs"
+            className="shrink-0 text-sm text-ink-soft transition-colors hover:text-spotlight"
+          >
+            进入商单大厅 →
+          </Link>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {gigList.slice(0, 3).map((g) => (
+            <GigCard key={g.id} gig={g} />
+          ))}
+        </div>
+      </section>
+
+      {/* 底部 CTA */}
+      <section className="mx-auto max-w-6xl px-6 pb-24">
+        <div className="flex flex-wrap items-center justify-between gap-8 rounded-[28px] bg-gradient-to-br from-[#1c1712] via-[#2a211a] to-[#3f2c20] px-10 py-12 text-[#f3ead9] shadow-2xl">
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-[#e8b960]">Ready for the stage</p>
+            <h2 className="mt-3 font-display text-3xl font-bold md:text-4xl">准备上场了吗？</h2>
+            <p className="mt-2 max-w-md text-[#c8b9a4]">
+              主持人找商单，商家找主持，都在台前直接聊。砍掉微信群和中介。
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/host/gigs">
+              <Button size="lg" className="gap-2">
+                我是主持人
+                <Icon name="arrow-right" size={16} />
+              </Button>
+            </Link>
+            <Link href="/merchant/hosts">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-[#c8b9a4]/40 bg-transparent text-[#f3ead9] hover:bg-white/10 hover:text-white"
+              >
+                找主持人
+              </Button>
+            </Link>
+          </div>
+        </div>
       </section>
     </main>
   );

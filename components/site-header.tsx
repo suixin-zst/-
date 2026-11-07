@@ -24,6 +24,7 @@ export async function SiteHeader() {
   }
 
   return (
+    <>
     <header className="sticky top-0 z-40 border-b border-line/70 bg-paper/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
         <div className="flex items-center gap-6">
@@ -85,5 +86,29 @@ export async function SiteHeader() {
         </div>
       </div>
     </header>
+
+    {/* 游客柔性引导条：仅未登录显示 */}
+    {!user ? (
+      <div className="border-b border-line/60 bg-spotlight-tint/50">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-6 py-2 text-sm">
+          <p className="text-ink-2">
+            <span className="font-semibold text-spotlight-deep">游客浏览中</span>
+            <span className="text-ink-soft"> · 注册后即可报名商单、邀约主持人</span>
+          </p>
+          <div className="flex shrink-0 items-center gap-3">
+            <Link href="/auth/login" className="text-ink-soft transition-colors hover:text-spotlight">
+              登录
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="rounded-full bg-spotlight px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-spotlight-deep"
+            >
+              免费注册
+            </Link>
+          </div>
+        </div>
+      </div>
+    ) : null}
+    </>
   );
 }

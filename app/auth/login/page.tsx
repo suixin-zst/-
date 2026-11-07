@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useRef, useEffect, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -16,40 +16,70 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // 用 ref 存定时器：state 在回调里读到的是旧闭包值，清不掉
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  function clearTimer() {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
-    if (authError) {
-      setError("邮箱或密码不对，再检查一下");
+    // 10 秒兜底：网络或 Supabase 无响应时不至于永远停在「登录中…」
+    timeoutRef.current = setTimeout(() => {
+      setError("登录超时，请检查网络或稍后重试");
       setLoading(false);
-      return;
-    }
+    }, 10000);
 
-    // 按角色分流进各自工作台
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    let role: "host" | "merchant" = "host";
-    if (user) {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-      if (error) {
-        console.error("Failed to fetch profile:", error);
-      } else if ((data as any)?.role === "merchant") {
-        role = "merchant";
+    try {
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      if (authError) {
+        clearTimer();
+        setError("邮箱或密码不对，再检查一下");
+        setLoading(false);
+        return;
       }
-    }
 
-    router.push(role === "host" ? "/host/dashboard" : "/merchant/dashboard");
-    router.refresh();
+      // 按角色分流进各自工作台；取档案失败不阻断登录，落到主持人端并留日志
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      let role: "host" | "merchant" = "host";
+      if (user) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+        if (error) {
+          console.error("Failed to fetch profile:", error);
+        } else if (data?.role === "merchant") {
+          role = "merchant";
+        }
+      }
+
+      clearTimer();
+      router.push(role === "host" ? "/host/dashboard" : "/merchant/dashboard");
+      router.refresh();
+    } catch (err) {
+      clearTimer();
+      console.error("Login failed:", err);
+      setError("网络错误，请稍后重试");
+      setLoading(false);
+    }
   }
 
   return (

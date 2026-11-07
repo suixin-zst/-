@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent, useEffect } from "react";
+import { useState, useRef, type FormEvent, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -19,16 +19,22 @@ export function SignupForm({ initialRole }: { initialRole: Role }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  // 用 ref 而非 state：state 更新是异步的，回调里读到的会是旧闭包值，定时器清不掉
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // 组件卸载时兜底清理，防止定时器在离开页面后触发 setState
   useEffect(() => {
     return () => {
-      // 清理定时器防止内存泄漏
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [timeoutId]);
+  }, []);
+
+  function clearTimer() {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,11 +49,10 @@ export function SignupForm({ initialRole }: { initialRole: Role }) {
     }
 
     // 设置 10 秒超时
-    const id = setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       setError("注册超时，请检查网络或稍后重试");
       setLoading(false);
     }, 10000);
-    setTimeoutId(id);
     setLoading(true);
 
     try {
@@ -59,11 +64,7 @@ export function SignupForm({ initialRole }: { initialRole: Role }) {
         options: { data: { name: name.trim(), role } },
       });
 
-      // 清除超时定时器
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        setTimeoutId(null);
-      }
+      clearTimer();
 
       if (authError) {
         setError(authError.message);
@@ -71,9 +72,9 @@ export function SignupForm({ initialRole }: { initialRole: Role }) {
         return;
       }
 
-      // session 为空 = 邮箱验证开着（demo 应当关闭，见 README）
+      // 有 user 无 session = Supabase 的 Confirm email 还开着，注册不返回会话
       if (data.user && !data.session) {
-        setError("注册成功，但需要邮箱验证。请到 Supabase 关闭 Confirm email（README 第 3 步）");
+        setError("已创建账号，但 Supabase 还开着邮箱验证。请到 Authentication → Sign In / Providers → Email 关闭 Confirm email 后再试");
         setLoading(false);
         return;
       }
@@ -83,12 +84,7 @@ export function SignupForm({ initialRole }: { initialRole: Role }) {
       router.push(role === "host" ? "/host/dashboard" : "/merchant/dashboard");
       router.refresh();
     } catch (err) {
-      // 清除超时定时器
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        setTimeoutId(null);
-      }
-
+      clearTimer();
       setError("网络错误，请稍后重试");
       setLoading(false);
     }

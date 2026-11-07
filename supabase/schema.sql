@@ -259,15 +259,15 @@ drop policy if exists "本人可写评价" on public.reviews;
 create policy "本人可写评价" on public.reviews for insert to authenticated with check (reviewer_id = auth.uid());
 
 -- ---------- 索引 ----------
-create index if not exists on public.host_profiles (city);
-create index if not exists on public.gigs (city);
-create index if not exists on public.gigs (status, event_date);
-create index if not exists on public.works (host_id);
-create index if not exists on public.applications (gig_id);
-create index if not exists on public.applications (host_id);
-create index if not exists on public.conversations (host_id);
-create index if not exists on public.conversations (merchant_id);
-create index if not exists on public.messages (conversation_id, created_at);
+create index if not exists idx_host_profiles_city on public.host_profiles (city);
+create index if not exists idx_gigs_city on public.gigs (city);
+create index if not exists idx_gigs_status_event_date on public.gigs (status, event_date);
+create index if not exists idx_works_host_id on public.works (host_id);
+create index if not exists idx_applications_gig_id on public.applications (gig_id);
+create index if not exists idx_applications_host_id on public.applications (host_id);
+create index if not exists idx_conversations_host_id on public.conversations (host_id);
+create index if not exists idx_conversations_merchant_id on public.conversations (merchant_id);
+create index if not exists idx_messages_conversation_created on public.messages (conversation_id, created_at);
 
 -- ---------- Realtime（聊天订阅用） ----------
 do $$ begin alter publication supabase_realtime add table public.messages; exception when duplicate_object then null; end $$;

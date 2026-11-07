@@ -23,6 +23,7 @@ export interface Database {
         Row: { id: string; role: Role; name: string; avatar_url: string | null; created_at: string };
         Insert: { id?: string; role: Role; name?: string; avatar_url?: string | null; created_at?: string };
         Update: { id?: string; role?: Role; name?: string; avatar_url?: string | null; created_at?: string };
+        Relationships: [];
       };
       host_profiles: {
         Row: {
@@ -43,16 +44,19 @@ export interface Database {
           price_full_day?: number | null; experience_years?: number | null; is_verified?: boolean;
           rating?: number; rating_count?: number;
         };
+        Relationships: [];
       };
       merchant_profiles: {
         Row: { user_id: string; company: string | null; industry: string | null; intro: string | null; is_verified: boolean };
         Insert: { user_id: string; company?: string | null; industry?: string | null; intro?: string | null; is_verified?: boolean };
         Update: { user_id?: string; company?: string | null; industry?: string | null; intro?: string | null; is_verified?: boolean };
+        Relationships: [];
       };
       works: {
         Row: { id: string; host_id: string; type: WorkType; url: string; title: string | null; sort: number; created_at: string };
         Insert: { id?: string; host_id: string; type: WorkType; url: string; title?: string | null; sort?: number; created_at?: string };
         Update: { id?: string; host_id?: string; type?: WorkType; url?: string; title?: string | null; sort?: number; created_at?: string };
+        Relationships: [];
       };
       gigs: {
         Row: {
@@ -70,26 +74,31 @@ export interface Database {
           event_date?: string; duration?: string; budget_min?: number | null; budget_max?: number | null;
           requirements?: string | null; description?: string | null; status?: GigStatus; created_at?: string;
         };
+        Relationships: [];
       };
       applications: {
         Row: { id: string; gig_id: string; host_id: string; initiator: ApplicationInitiator; status: ApplicationStatus; message: string | null; created_at: string };
         Insert: { id?: string; gig_id: string; host_id: string; initiator: ApplicationInitiator; status?: ApplicationStatus; message?: string | null; created_at?: string };
         Update: { id?: string; gig_id?: string; host_id?: string; initiator?: ApplicationInitiator; status?: ApplicationStatus; message?: string | null; created_at?: string };
+        Relationships: [];
       };
       conversations: {
         Row: { id: string; gig_id: string | null; host_id: string; merchant_id: string; created_at: string };
         Insert: { id?: string; gig_id?: string | null; host_id: string; merchant_id: string; created_at?: string };
         Update: { id?: string; gig_id?: string | null; host_id?: string; merchant_id?: string; created_at?: string };
+        Relationships: [];
       };
       messages: {
         Row: { id: string; conversation_id: string; sender_id: string; content: string; created_at: string };
         Insert: { id?: string; conversation_id: string; sender_id: string; content: string; created_at?: string };
         Update: { id?: string; conversation_id?: string; sender_id?: string; content?: string; created_at?: string };
+        Relationships: [];
       };
       reviews: {
         Row: { id: string; gig_id: string; reviewer_id: string; reviewee_id: string; rating: number; content: string | null; created_at: string };
         Insert: { id?: string; gig_id: string; reviewer_id: string; reviewee_id: string; rating: number; content?: string | null; created_at?: string };
         Update: { id?: string; gig_id?: string; reviewer_id?: string; reviewee_id?: string; rating?: number; content?: string | null; created_at?: string };
+        Relationships: [];
       };
     };
     Views: { [_ in never]: never };

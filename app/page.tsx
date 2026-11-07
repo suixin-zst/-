@@ -62,16 +62,15 @@ export default async function HomePage() {
                 主持人 × 商家 · 直聘平台
               </p>
 
-              <h1 className="font-display text-5xl font-bold leading-[1.1] md:text-6xl">
+              <h1 className="font-display text-5xl font-bold leading-[1.12] md:text-6xl">
                 好主持，
                 <br />
-                不该只在
+                值得一个更好的
                 <span className="relative inline-block">
-                  <span className="relative z-10">群里</span>
-                  <span className="absolute bottom-0 left-0 right-0 h-3 bg-spotlight-tint" />
+                  <span className="relative z-10">台前</span>
+                  <span className="absolute bottom-1 left-0 right-0 h-3 bg-spotlight-tint" />
                 </span>
-                <br />
-                等活。
+                。
               </h1>
 
               <p className="mt-8 max-w-lg text-lg text-ink-2">
@@ -284,36 +283,6 @@ export default async function HomePage() {
         <p className="mt-8 text-center text-sm text-ink-soft">
           共 {gigCount} 张商单正在招募
         </p>
-      </section>
-
-      {/* 底部 CTA */}
-      <section className="mx-auto max-w-6xl px-6 pb-24">
-        <div className="flex flex-wrap items-center justify-between gap-8 rounded-[28px] bg-gradient-to-br from-[#1c1712] via-[#2a211a] to-[#3f2c20] px-10 py-12 text-[#f3ead9] shadow-2xl">
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-[#e8b960]">Ready for the stage</p>
-            <h2 className="mt-3 font-display text-3xl font-bold md:text-4xl">准备上场了吗？</h2>
-            <p className="mt-2 max-w-md text-[#c8b9a4]">
-              主持人找商单，商家找主持，都在台前直接聊。砍掉微信群和中介。
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/host/gigs">
-              <Button size="lg" className="gap-2">
-                我是主持人
-                <Icon name="arrow-right" size={16} />
-              </Button>
-            </Link>
-            <Link href="/merchant/hosts">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-[#c8b9a4]/40 bg-transparent text-[#f3ead9] hover:bg-white/10 hover:text-white"
-              >
-                找主持人
-              </Button>
-            </Link>
-          </div>
-        </div>
       </section>
     </main>
   );

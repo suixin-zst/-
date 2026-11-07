@@ -31,19 +31,23 @@ export default async function HomePage() {
     <main className="overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-[calc(100vh-4rem)]">
-        {/* 背景装饰：径向渐变 + 网格 */}
-        <div
-          className="absolute inset-0 -z-10"
-          style={{
-            backgroundImage: `
-              radial-gradient(circle at 12% -8%, rgba(178, 58, 47, 0.07), transparent 38%),
-              radial-gradient(circle at 88% 2%, rgba(201, 149, 60, 0.09), transparent 34%),
-              linear-gradient(rgba(21, 17, 14, 0.024) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(21, 17, 14, 0.024) 1px, transparent 1px)
-            `,
-            backgroundSize: "auto, auto, 32px 32px, 32px 32px",
-          }}
-        />
+        {/* 舞台灯光背景：顶部聚光锥 + 中轴暖光 + 舞台地板 */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="stage-cone absolute -top-28 left-1/2 h-[72vh] w-[560px] -translate-x-[72%] rotate-6" />
+          <div className="stage-cone absolute -top-28 left-1/2 h-[72vh] w-[560px] -translate-x-[28%] -rotate-6 opacity-50" />
+          <div className="absolute left-1/2 top-0 h-[62vh] w-[980px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_top,rgba(201,149,60,0.12),transparent_70%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-paper-2/70 to-transparent" />
+          {/* 舞台顶灯 */}
+          <div className="absolute left-1/2 top-6 flex -translate-x-1/2 gap-3">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <span
+                key={i}
+                className="h-1.5 w-1.5 rounded-full bg-gold/40"
+                style={{ opacity: 0.25 + i * 0.12 }}
+              />
+            ))}
+          </div>
+        </div>
 
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-24">
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-8">
@@ -90,6 +94,8 @@ export default async function HomePage() {
 
             {/* 右侧：主持人卡片示意 */}
             <div className="relative flex items-center justify-center lg:justify-end">
+              {/* 卡片背后的聚光光晕 */}
+              <div className="pointer-events-none absolute h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(178,58,47,0.32),rgba(201,149,60,0.12)_55%,transparent_72%)] blur-2xl" />
               {/* 浮动装饰元素 */}
               <div className="absolute top-8 left-8 rounded-card border border-line bg-card px-4 py-2 shadow-lg md:left-0">
                 <div className="flex items-center gap-2 text-sm">
@@ -105,30 +111,30 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              {/* 主卡片 */}
-              <div className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-line bg-card shadow-2xl">
-                {/* 顶部标签 */}
-                <div className="flex items-center justify-between bg-spotlight-tint px-6 py-4">
-                  <Tag tone="ink">婚礼 / 年会</Tag>
-                  <span className="flex items-center gap-1 text-xs font-medium">
-                    <Icon name="check" size={12} />
-                    已认证
+              {/* 主卡片：话筒造型 */}
+              <div className="relative w-full max-w-sm">
+                {/* 话筒头 */}
+                <div className="mic-head relative mx-auto flex h-72 w-[88%] items-center justify-center overflow-hidden rounded-t-[220px] rounded-b-3xl shadow-[0_30px_70px_-30px_rgba(21,17,14,0.7)] ring-1 ring-black/25">
+                  <span className="absolute top-5 text-[#f0d6a0]/60">
+                    <Icon name="mic" size={18} strokeWidth={2} />
                   </span>
-                </div>
-
-                {/* 头像占位 */}
-                <div className="flex h-64 items-center justify-center bg-gradient-to-b from-spotlight-tint to-card">
-                  <span className="font-display text-8xl font-bold text-spotlight/20">
+                  <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-black/30 px-2.5 py-1 text-[11px] font-semibold text-[#f0d6a0] backdrop-blur">
+                    <Icon name="check" size={11} strokeWidth={3} /> 已认证
+                  </span>
+                  <span className="relative font-display text-[7rem] font-bold leading-none text-[#f3ead9]/85">
                     林
                   </span>
+                  <span className="absolute bottom-4 right-4 grid h-10 w-10 place-items-center rounded-full bg-black/45 text-[#f3ead9] shadow-lg backdrop-blur">
+                    <Icon name="play" size={15} />
+                  </span>
                 </div>
 
-                {/* 信息区 */}
-                <div className="px-6 py-5">
-                  <div className="mb-2">
+                {/* 话筒手柄（信息） */}
+                <div className="relative -mt-4 mx-auto w-[88%] rounded-3xl border border-line bg-card p-6 shadow-2xl">
+                  <div className="mb-2 flex items-center gap-2">
                     <h3 className="font-display text-xl font-semibold">林知遥</h3>
-                    <p className="text-sm text-ink-soft">上海 · 8 年经验</p>
                   </div>
+                  <p className="mb-3 text-sm text-ink-soft">上海 · 8 年经验</p>
 
                   <Rating rating={4.9} count={126} />
 
@@ -139,18 +145,20 @@ export default async function HomePage() {
                   </div>
 
                   <div className="mt-5 flex items-end justify-between border-t border-line pt-4">
-                    <div>
-                      <p className="font-display text-2xl font-bold">
-                        ¥4,500
-                        <span className="text-sm font-normal text-ink-soft"> / 半天起</span>
-                      </p>
-                    </div>
+                    <p className="font-display text-2xl font-bold">
+                      ¥4,500
+                      <span className="text-sm font-normal text-ink-soft"> / 半天起</span>
+                    </p>
                     <span className="flex items-center gap-1.5 rounded-full bg-jade-soft px-3 py-1 text-xs font-medium text-jade-deep">
                       <span className="h-1.5 w-1.5 rounded-full bg-jade" />
                       可接 11/08
                     </span>
                   </div>
                 </div>
+
+                {/* 话筒支架 */}
+                <div className="mx-auto mt-3 h-5 w-px bg-line-strong" />
+                <div className="mx-auto h-1.5 w-20 rounded-full bg-line-strong" />
               </div>
 
               {/* 麦克风图标 */}

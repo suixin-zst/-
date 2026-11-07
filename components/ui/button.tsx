@@ -5,8 +5,10 @@ type Variant = "primary" | "outline" | "ghost";
 type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-spotlight text-white hover:bg-spotlight-deep",
-  outline: "border border-line bg-card text-ink hover:border-spotlight hover:text-spotlight",
+  primary:
+    "bg-gradient-to-b from-spotlight to-spotlight-deep text-white shadow-[0_8px_20px_-8px_rgba(142,43,35,0.65)] hover:shadow-[0_14px_30px_-10px_rgba(142,43,35,0.7)] hover:-translate-y-0.5 active:translate-y-0",
+  outline:
+    "border border-line-strong bg-card text-ink shadow-[0_1px_2px_rgba(21,17,14,0.04)] hover:border-spotlight hover:text-spotlight hover:shadow-[0_8px_20px_-12px_rgba(21,17,14,0.35)]",
   ghost: "text-ink-soft hover:bg-spotlight-tint hover:text-spotlight",
 };
 
@@ -27,7 +29,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ref={ref}
       type={type}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors",
+        "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-spotlight",
         "disabled:pointer-events-none disabled:opacity-50",
         variants[variant],

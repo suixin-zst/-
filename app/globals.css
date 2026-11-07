@@ -46,20 +46,61 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     font-family: var(--font-sans);
     color: var(--color-ink);
     background-color: var(--color-paper);
+    /* 舞台感底色：中轴一束聚光 + 两侧暖色余光 + 极细网格 */
     background-image:
-      radial-gradient(circle at 12% -8%, rgba(178, 58, 47, 0.07), transparent 38%),
-      radial-gradient(circle at 88% 2%, rgba(201, 149, 60, 0.09), transparent 34%),
-      linear-gradient(rgba(21, 17, 14, 0.024) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(21, 17, 14, 0.024) 1px, transparent 1px);
-    background-size: auto, auto, 32px 32px, 32px 32px;
+      radial-gradient(ellipse 68% 42% at 50% -12%, rgba(178, 58, 47, 0.10), transparent 62%),
+      radial-gradient(circle at 12% -8%, rgba(178, 58, 47, 0.06), transparent 40%),
+      radial-gradient(circle at 88% 0%, rgba(201, 149, 60, 0.09), transparent 38%),
+      linear-gradient(rgba(21, 17, 14, 0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(21, 17, 14, 0.022) 1px, transparent 1px);
+    background-size: auto, auto, auto, 32px 32px, 32px 32px;
+    background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background: rgba(178, 58, 47, 0.2);
+    background: rgba(178, 58, 47, 0.22);
+  }
+}
+
+@layer utilities {
+  /* 聚光灯锥形光束（用于页首舞台氛围），纯装饰、不挡交互 */
+  .stage-cone {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 236, 210, 0.55),
+      rgba(255, 236, 210, 0.12) 40%,
+      transparent 78%
+    );
+    clip-path: polygon(38% 0, 62% 0, 88% 100%, 12% 100%);
+    filter: blur(26px);
+    opacity: 0.6;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  /* 话筒头：青铜金属 + 金色网孔，主持人/商单卡的顶部造型 */
+  .mic-head {
+    position: relative;
+    background-color: #201a14;
+    background-image:
+      radial-gradient(circle, rgba(248, 226, 172, 0.34) 1.15px, transparent 1.9px),
+      radial-gradient(circle, rgba(120, 96, 60, 0.45) 1px, transparent 2.4px),
+      radial-gradient(circle at 50% 12%, rgba(255, 248, 226, 0.28), transparent 55%),
+      linear-gradient(165deg, #6b5740 0%, #3d331f 46%, #1b1610 100%);
+    background-size: 7px 7px, 7px 7px, auto, auto;
+    background-position: 0 0, 3.5px 3.5px, center, center;
   }
 }

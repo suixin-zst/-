@@ -9,11 +9,12 @@ import type { GigWithMerchant } from "@/lib/hosts";
  * 商单卡片 —— 列表项
  *
  * 信息密度高：类型、城市、日期、时长、预算一目了然
+ * 整个卡片可点击，hover 时有明显视觉反馈
  */
 export function GigCard({ gig }: { gig: GigWithMerchant }) {
   return (
-    <Link href={`/gig/${gig.id}`} className="group block">
-      <Card className="flex h-full flex-col justify-between p-5 transition-shadow hover:shadow-lg">
+    <Link href={`/gig/${gig.id}`} className="group block h-full">
+      <Card className="flex h-full cursor-pointer flex-col justify-between p-5 transition-all hover:border-spotlight hover:shadow-lg">
         <div>
           <div className="flex items-center justify-between">
             <Tag tone="gold">{gig.type}</Tag>
@@ -48,7 +49,7 @@ export function GigCard({ gig }: { gig: GigWithMerchant }) {
         </div>
 
         <div className="mt-5 flex items-center justify-between border-t border-dashed border-line pt-4 text-sm">
-          <span className="font-medium text-spotlight">查看详情 →</span>
+          <span className="font-medium text-spotlight group-hover:underline">查看详情 →</span>
           <span className="text-ink-soft">
             {new Date(gig.created_at).toLocaleDateString("zh-CN")}
           </span>

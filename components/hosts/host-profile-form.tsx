@@ -13,7 +13,7 @@ import type { HostProfileRow } from "@/lib/types";
 
 interface Props {
   hostId: string;
-  profile: HostProfileRow;
+  profile: HostProfileRow | null;
 }
 
 /**
@@ -26,14 +26,14 @@ export function HostProfileForm({ hostId, profile }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [city, setCity] = useState(profile.city ?? "");
-  const [bio, setBio] = useState(profile.bio ?? "");
-  const [stylesStr, setStylesStr] = useState(profile.styles.join(", "));
-  const [priceHourly, setPriceHourly] = useState(profile.price_hourly?.toString() ?? "");
-  const [priceHalfDay, setPriceHalfDay] = useState(profile.price_half_day?.toString() ?? "");
-  const [priceFullDay, setPriceFullDay] = useState(profile.price_full_day?.toString() ?? "");
+  const [city, setCity] = useState(profile?.city ?? "");
+  const [bio, setBio] = useState(profile?.bio ?? "");
+  const [stylesStr, setStylesStr] = useState(profile?.styles?.join(", ") ?? "");
+  const [priceHourly, setPriceHourly] = useState(profile?.price_hourly?.toString() ?? "");
+  const [priceHalfDay, setPriceHalfDay] = useState(profile?.price_half_day?.toString() ?? "");
+  const [priceFullDay, setPriceFullDay] = useState(profile?.price_full_day?.toString() ?? "");
   const [experienceYears, setExperienceYears] = useState(
-    profile.experience_years?.toString() ?? ""
+    profile?.experience_years?.toString() ?? ""
   );
 
   async function handleSubmit(e: FormEvent) {
@@ -44,19 +44,22 @@ export function HostProfileForm({ hostId, profile }: Props) {
     const client = createClient();
     const { error: updateError } = await client
       .from("host_profiles")
-      .update({
-        city: city.trim() || null,
-        bio: bio.trim() || null,
-        styles: stylesStr
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-        price_hourly: priceHourly ? parseInt(priceHourly) : null,
-        price_half_day: priceHalfDay ? parseInt(priceHalfDay) : null,
-        price_full_day: priceFullDay ? parseInt(priceFullDay) : null,
-        experience_years: experienceYears ? parseInt(experienceYears) : null,
-      })
-      .eq("user_id", hostId);
+      .upsert(
+        {
+          user_id: hostId,
+          city: city.trim() || null,
+          bio: bio.trim() || null,
+          styles: stylesStr
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+          price_hourly: priceHourly ? parseInt(priceHourly) : null,
+          price_half_day: priceHalfDay ? parseInt(priceHalfDay) : null,
+          price_full_day: priceFullDay ? parseInt(priceFullDay) : null,
+          experience_years: experienceYears ? parseInt(experienceYears) : null,
+        },
+        { onConflict: "user_id" }
+      );
 
     if (updateError) {
       setError(updateError.message);

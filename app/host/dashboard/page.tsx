@@ -68,25 +68,27 @@ export default async function HostDashboardPage() {
 
       {/* 快捷入口 */}
       <div className="mt-8 grid gap-4 md:grid-cols-3">
-        <Card className="p-5">
-          <Icon name="search" size={20} className="text-spotlight" />
-          <p className="mt-3 font-medium">商单大厅</p>
-          <p className="mt-1 text-sm text-ink-soft">浏览开放商单，一键报名</p>
-        </Card>
-        <Card className="p-5">
-          <Link href="/chat" className="block">
+        <Link href="/host/gigs" className="block">
+          <Card className="p-5 transition-all hover:border-spotlight hover:shadow-md">
+            <Icon name="search" size={20} className="text-spotlight" />
+            <p className="mt-3 font-medium">商单大厅</p>
+            <p className="mt-1 text-sm text-ink-soft">浏览开放商单，一键报名</p>
+          </Card>
+        </Link>
+        <Link href="/chat" className="block">
+          <Card className="p-5 transition-all hover:border-spotlight hover:shadow-md">
             <Icon name="message" size={20} className="text-spotlight" />
             <p className="mt-3 font-medium">消息</p>
             <p className="mt-1 text-sm text-ink-soft">和商家直接聊</p>
-          </Link>
-        </Card>
-        <Card className="p-5">
-          <Link href={`/host/${user.id}`} className="block">
+          </Card>
+        </Link>
+        <Link href={`/host/${user.id}`} className="block">
+          <Card className="p-5 transition-all hover:border-spotlight hover:shadow-md">
             <Icon name="users" size={20} className="text-spotlight" />
             <p className="mt-3 font-medium">我的主页</p>
             <p className="mt-1 text-sm text-ink-soft">查看商家看到的样子</p>
-          </Link>
-        </Card>
+          </Card>
+        </Link>
       </div>
 
       {/* 报名列表 */}

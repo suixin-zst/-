@@ -3,6 +3,8 @@ import { loadHosts } from "@/lib/hosts";
 import { HostDirectory } from "@/components/hosts/host-directory";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { demoHosts } from "@/lib/demo-data";
+import type { HostListItem } from "@/lib/hosts";
 
 export const metadata = { title: "主持人列表 · 台前" };
 
@@ -13,7 +15,23 @@ export const metadata = { title: "主持人列表 · 台前" };
  */
 export default async function MerchantHostsPage() {
   const supabase = await createClient();
-  const hosts = await loadHosts(supabase);
+  let hosts = await loadHosts(supabase);
+
+  // 数据库空时用 demo 主持人兜底
+  if (hosts.length === 0) {
+    hosts = demoHosts.map((h) => ({
+      id: h.id,
+      name: h.name,
+      avatarUrl: h.avatarUrl,
+      city: h.city,
+      styles: h.styles,
+      priceHourly: h.priceHourly,
+      priceHalfDay: h.priceHalfDay,
+      rating: h.rating,
+      ratingCount: h.ratingCount,
+      isVerified: h.isVerified,
+    }));
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">

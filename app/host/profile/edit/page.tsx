@@ -29,14 +29,16 @@ export default async function HostProfileEditPage() {
   if (profile?.role !== "host") redirect("/merchant/dashboard");
 
   const hostProfile = await loadHostProfile(supabase, user.id);
-  if (!hostProfile) redirect("/host/dashboard");
+  // 不 redirect —— 首次创建资料的用户也需要填这个表单
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm uppercase tracking-widest text-spotlight">Host profile</p>
-          <h1 className="mt-2 font-display text-3xl font-semibold">编辑你的主页</h1>
+          <h1 className="mt-2 font-display text-3xl font-semibold">
+            {hostProfile ? "编辑你的主页" : "完善你的主页"}
+          </h1>
           <p className="mt-2 text-ink-soft">作品、报价、一句话定位。商家先看这些，再决定要不要聊。</p>
         </div>
         <div className="flex gap-2">

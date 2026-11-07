@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>台前 · 产品价值对比</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#f5efe4; --paper-2:#ede4d4; --card:#fffaf0;
+    --ink:#15110e; --ink-soft:#7b7062; --ink-2:#221c17;
+    --line:#ddd2bf; --line-strong:#c7b9a2;
+    --spotlight:#b23a2f; --spotlight-deep:#8e2b23; --spotlight-tint:#f3e0da;
+    --gold:#c9953c; --gold-tint:#f6ead2; --gold-deep:#9c6f24;
+    --jade:#2e5e4e; --jade-deep:#22493d; --jade-soft:#e0ebe5;
+    --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--sans); color:var(--ink); background:var(--paper);
+    min-height:100vh; -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(circle at 10% -6%, rgba(178,58,47,.07), transparent 40%),
+      radial-gradient(circle at 90% 0%, rgba(201,149,60,.09), transparent 36%),
+      linear-gradient(rgba(21,17,14,.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(21,17,14,.022) 1px, transparent 1px);
+    background-size:auto,auto,34px 34px,34px 34px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:64px 28px 80px}
+
+  /* ---------- Hero ---------- */
+  .kicker{font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:var(--spotlight);font-weight:600}
+  h1{font-family:var(--serif);font-size:clamp(34px,5vw,58px);line-height:1.12;font-weight:700;margin-top:18px;letter-spacing:-.01em}
+  h1 .hl{position:relative;display:inline-block}
+  h1 .hl::after{content:"";position:absolute;left:0;right:0;bottom:4px;height:12px;background:var(--spotlight-tint);z-index:-1}
+  .sub{margin-top:22px;max-width:720px;font-size:18px;line-height:1.75;color:var(--ink-2)}
+  .sub b{color:var(--spotlight-deep)}
+
+  /* ---------- Cards ---------- */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:54px}
+  @media(max-width:960px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    position:relative;background:var(--card);border:1px solid var(--line);
+    border-radius:22px;padding:30px 28px 32px;overflow:hidden;
+    box-shadow:0 1px 0 rgba(21,17,14,.03);
+    transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    display:flex;flex-direction:column;
+  }
+  .card:hover{transform:translateY(-4px);box-shadow:0 18px 40px -18px rgba(21,17,14,.28)}
+  .card::before{content:"";position:absolute;inset:0 0 auto 0;height:5px}
+  .card.host::before{background:var(--spotlight)}
+  .card.merchant::before{background:var(--gold)}
+  .card.diff::before{background:var(--jade)}
+
+  .card .tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .card.host .tag{color:var(--spotlight-deep)}
+  .card.merchant .tag{color:var(--gold-deep)}
+  .card.diff .tag{color:var(--jade-deep)}
+  .card .num{font-family:var(--serif);font-size:15px;font-weight:700;opacity:.5;margin-left:auto}
+
+  .card h2{font-family:var(--serif);font-size:26px;line-height:1.25;margin-top:14px;font-weight:700}
+  .card .pain{margin-top:12px;font-size:14px;line-height:1.65;color:var(--ink-soft);
+    padding:10px 12px;border-radius:12px;background:var(--paper-2)}
+  .card .pain b{color:var(--ink-2);font-weight:600}
+
+  .divider{height:1px;background:var(--line);margin:20px 0 6px}
+
+  ul{list-style:none;display:flex;flex-direction:column;gap:13px;margin-top:6px}
+  li{display:flex;gap:11px;font-size:15px;line-height:1.6;color:var(--ink-2)}
+  li .dot{flex:0 0 auto;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+    font-size:12px;font-weight:700;margin-top:1px}
+  .card.host li .dot{background:var(--spotlight-tint);color:var(--spotlight-deep)}
+  .card.merchant li .dot{background:var(--gold-tint);color:var(--gold-deep)}
+  .card.diff li .dot{background:var(--jade-soft);color:var(--jade-deep)}
+  li b{font-weight:600;color:var(--ink)}
+  li .muted{color:var(--ink-soft);font-weight:400}
+
+  /* ---------- Footer positioning band ---------- */
+  .band{
+    margin-top:40px;border-radius:22px;padding:34px 36px;
+    background:linear-gradient(135deg,#1c1712,#2a211a 60%,#3a2a20);
+    color:#f3ead9;display:flex;align-items:center;gap:28px;flex-wrap:wrap;
+    box-shadow:0 24px 60px -30px rgba(21,17,14,.6);
+  }
+  .band .big{font-family:var(--serif);font-size:clamp(22px,3vw,34px);font-weight:700;line-height:1.3}
+  .band .big em{color:#e8b960;font-style:normal}
+  .band .meta{margin-left:auto;text-align:right;font-size:13px;line-height:1.9;color:#c8b9a4}
+  .band .meta .fee{font-family:var(--serif);font-size:30px;font-weight:700;color:#e8b960;display:block;line-height:1.1}
+  .band .meta .fee small{font-size:14px;font-weight:400;color:#c8b9a4}
+
+  .foot{margin-top:26px;font-size:12px;color:var(--ink-soft);letter-spacing:.04em;text-align:center}
+  .foot b{color:var(--ink-2)}
+
+  @media print{body{background:#fff}.card:hover{transform:none;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="kicker">台前 · 产品价值</div>
+  <h1>好主持，<span class="hl">不该只在群里等活。</span></h1>
+  <p class="sub">
+    台前把 <b>BOSS 直聘「双方直接聊、去掉中间人」的模式</b>，搬到「按场次结算的活动主持」场景——
+    砍掉微信群的混乱和信息不透明，也砍掉中介 <b>30% 的抽成</b>，平台只收 <b>8%</b>。
+  </p>
+
+  <div class="grid">
+
+    <!-- 卡 1：主持人 -->
+    <section class="card host">
+      <div class="tag">FOR HOSTS · 主持人价值 <span class="num">01</span></div>
+      <h2>从「被抽成、被动等活」<br/>到「自己定价、主动找活」</h2>
+      <div class="pain">现状：作品散在朋友圈、每次被当新人重介绍，靠群主派单，中介抽走 <b>30%</b>。</div>
+      <div class="divider"></div>
+      <ul>
+        <li><span class="dot">✓</span><span><b>主页 + 作品集</b>（视频/音频/图片），一次建立专业档案，不再反复自证</span></li>
+        <li><span class="dot">✓</span><span><b>自主定价</b>：时薪 / 半天 / 全天自己定，平台仅抽 <b>8%</b>，收入更透明</span></li>
+        <li><span class="dot">✓</span><span><b>商单大厅</b>按城市 / 类型 / 档期 / 预算筛选，<b>一键报名</b></span></li>
+        <li><span class="dot">✓</span><span>和商家<b>直接聊</b>，谈档期谈价格，越过中间人</span></li>
+        <li><span class="dot">✓</span><span>评分 + 评价 + 实名认证，<b>信誉沉淀成资产</b>，老客可复购</span></li>
+      </ul>
+    </section>
+
+    <!-- 卡 2：商家 -->
+    <section class="card merchant">
+      <div class="tag">FOR MERCHANTS · 商家价值 <span class="num">02</span></div>
+      <h2>从「群里瞎找、靠赌」<br/>到「看作品评价、精准邀约」</h2>
+      <div class="pain">现状：群里发需求来一堆人、质量参差，靠熟人推荐、选择面窄，还得吃中介加价。</div>
+      <div class="divider"></div>
+      <ul>
+        <li><span class="dot">✓</span><span>按城市 / 类型 / 预算 / <b>评分</b>精准筛人，不用挨个问</span></li>
+        <li><span class="dot">✓</span><span>先看<b>作品 + 评价 + 认证</b>再决定聊不聊，降低踩坑（放鸽子、现场不行）</span></li>
+        <li><span class="dot">✓</span><span><b>双通道</b>：发商单等报名（被动）或个人主页直接邀约（主动）</span></li>
+        <li><span class="dot">✓</span><span>明码标价、横向对比，<b>快速决策</b></span></li>
+        <li><span class="dot">✓</span><span>服务费透明 <b>8%</b>（对比中介 30%），成本可控</span></li>
+      </ul>
+    </section>
+
+    <!-- 卡 3：为什么不是抄 BOSS -->
+    <section class="card diff">
+      <div class="tag">WHY NOT JUST BOSS · 场景差异 <span class="num">03</span></div>
+      <h2>不是「抄 BOSS」，<br/>是把范式搬到对的场景</h2>
+      <div class="pain">BOSS 直聘是「全职招聘、按月薪」；台前是「单场活动、按场结」——底层逻辑完全不同。</div>
+      <div class="divider"></div>
+      <ul>
+        <li><span class="dot">1</span><span><b>按场次不按月薪</b>：一场一结，轻量撮合，不走 offer / 入职流程</span></li>
+        <li><span class="dot">2</span><span><b>作品即简历</b>：主持人的核心竞争力是视频/音频作品，不是文字履历</span></li>
+        <li><span class="dot">3</span><span><b>「档期」是核心维度</b>：找人第一问「这天有空吗」，BOSS 没有档期概念</span></li>
+        <li><span class="dot">4</span><span><b>双角色分流界面</b>：主持人看商单、商家看作品，两套入口，一进门就进自己的世界</span></li>
+        <li><span class="dot">5</span><span class="muted">诚实差距：资金担保、风控、规模背书是后期补齐的事，当前靠「闭环走顺 + 场景更贴」取胜</span></li>
+      </ul>
+    </section>
+
+  </div>
+
+  <!-- 定位带 -->
+  <div class="band">
+    <div class="big">把中介抽走的 30%，<br/><em>还给真正上场的人。</em></div>
+    <div class="meta">
+      平台服务费
+      <span class="fee">8%<small> / 单</small></span>
+      中介现状：30%
+    </div>
+  </div>
+
+  <p class="foot">台前 · <b>主持人 × 商家直聘平台</b> &nbsp;|&nbsp; 砍掉微信群，砍掉中介抽成</p>
+
+</div>
+</body>
+</html>

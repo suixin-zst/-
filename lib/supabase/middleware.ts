@@ -51,5 +51,27 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // 角色守卫：host 不能进 /merchant/**，merchant 不能进 /host/**
+  if (user && (path.startsWith("/host") || path.startsWith("/merchant"))) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile) {
+      if (profile.role === "host" && path.startsWith("/merchant")) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/host/dashboard";
+        return NextResponse.redirect(url);
+      }
+      if (profile.role === "merchant" && path.startsWith("/host")) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/merchant/dashboard";
+        return NextResponse.redirect(url);
+      }
+    }
+  }
+
   return supabaseResponse;
 }

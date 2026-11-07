@@ -29,9 +29,31 @@ export async function SiteHeader() {
           <Link href="/" className="font-display text-lg font-semibold tracking-wide">
             台前
           </Link>
-          {/* 消息入口：登录后才有会话，未登录不展示（点了也会被 middleware 弹回登录页） */}
+          {/* 按角色分流的业务导航 */}
           {profile ? (
             <nav className="flex items-center gap-4 text-sm">
+              {profile.role === "host" ? (
+                <>
+                  <Link href="/host/dashboard" className="text-ink-soft transition-colors hover:text-spotlight">
+                    工作台
+                  </Link>
+                  <Link href="/host/gigs" className="text-ink-soft transition-colors hover:text-spotlight">
+                    商单大厅
+                  </Link>
+                  <Link href={`/host/${user?.id}`} className="text-ink-soft transition-colors hover:text-spotlight">
+                    我的主页
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/merchant/dashboard" className="text-ink-soft transition-colors hover:text-spotlight">
+                    工作台
+                  </Link>
+                  <Link href="/merchant/hosts" className="text-ink-soft transition-colors hover:text-spotlight">
+                    浏览主持人
+                  </Link>
+                </>
+              )}
               <Link href="/chat" className="text-ink-soft transition-colors hover:text-spotlight">
                 消息
               </Link>
